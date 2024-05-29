@@ -1,16 +1,19 @@
 package idusw.springboot.ckjmall.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-// Annotation : java, lombok, spring (0)
-// 컴파일러에서 정확한 처리를 위해 제공하는 부연 설명
-// vs comment(주석) : 소스 코드를 이해하는 데 도움을 주기 위한 부연 설명
-// @RestController 는 현재 클래스가 Rest 형식으로 동작하는 요청 흐름을 제어하는 클래스임을 컴파일러에게 알려줌.
+
+/*
+@Controller
+@ResponseBody
+ */
 public class RestApiController {
-    @GetMapping(value={"api/v1", "api/v1/"}) // http://<host-ip>:<port>/api/v1/을 get 방식으로 요청하는 경우 처리
-    public String getRestApiV1(){
-        return "<h1> rest방식으로 처리한 결과를 반환 </h1>";
+    @GetMapping(value = {"my", "my/"})
+    public String getMy(HttpServletRequest request) {
+        // /my?fav=값 or /my/?fav=값
+        return "<h1>" + request.getParameter("fav") + "</h1>"; // view 지정 없이 바로 응답
     }
 }

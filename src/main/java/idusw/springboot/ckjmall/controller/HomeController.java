@@ -1,30 +1,67 @@
 package idusw.springboot.ckjmall.controller;
 
+import idusw.springboot.ckjmall.model.MemberDto;
+import idusw.springboot.ckjmall.service.HomeService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Map;
+
 @Controller
 public class HomeController {
-    @GetMapping(value={"api/v2", "api/v2/"}) // http://<host-ip>:<port>/api/v1/을 get 방식으로 요청하는 경우 처리
-    public String getRestApiV1(Model model){
-        // org.springframework.ui.model : UI(User Interface, View, Template 에서 사용하는 Model 클래스
-        // model 을 활용하여서 view 에게 속성을 전달
-        model.addAttribute("name", "조경준"); // model 객체에 속성을 추가(지정)
-        model.addAttribute("dept", "컴퓨터소프트웨어학과"); // model 객체에 속성을 추가(지정)
-        // view or template 파일을 지정해주어야 함.
-        return "./main/index"; // template 아래 main/index.html을 접근, (기본 dynamic web page)
+
+    //private HomeService homeService = new HomeServiceImpl3(); // tightly-coupled
+
+    /*
+    @Autowired // 필드 주입 : field injection - testing
+    private HomeService homeService;
+    */
+
+    // setter injection
+    /*
+    public void setHomeService(HomeService homeService) {
+        this.homeService = homeService;
     }
-    @GetMapping(value = {"400"})
-    public String go400(Model model){
-        model.addAttribute("msg","정보전달");
-        return "./error/400";
+    */
+    // loosely-coupled <- IoC Container, DI
+    private HomeService homeService;
+    public HomeController(HomeService homeService) { // constructor injection
+        this.homeService = homeService;
     }
 
-    @GetMapping(value = {"", "/"})
-    public String goHome(Model model){
-        model.addAttribute("msg", "정보전달");
-        return "./main/index"; // index.html에 전달
+    @GetMapping(value={"/", ""}) // Get Method 요청으로 처리하라는 annotation
+    public String goLogin(HttpServletRequest request, Model model) {
+        return "./main/index";
+        //return "redirect:/members/login"; // GetMapping이 members/login 또는 /members/login으로 매핑
     }
 
+    // http://localhost:8080/?name=<value> : 매개변수 값이 request객체에 저장됨
+    @GetMapping(value={"/1"}) // Get Method 요청으로 처리하라는 annotation
+    public String getRoot(HttpServletRequest request, Model model) {
+        homeService.sayHello();
+        // model : dto (data transfer object)
+        // -- model --> service -- model --> repository -> service -> controller -> view
+        model.addAttribute("greeting", request.getParameter("name"));
+        return "main/index"; // view
+    }
+    // ?<search_part> or <query_string> : 매개변수를 Map객체로 전달받음
+    // /2?name=<value>&email=<value>
+    @GetMapping("/2")
+    public String getIndex2(@RequestParam Map<String, String> param, Model model) {
+        MemberDto memberDto = MemberDto.builder().build();
+        memberDto.setId("egyou");
+        memberDto.setName(param.get("name"));
+        memberDto.setEmail(param.get("email"));
+
+        // spring에서 ui 통해 view에게 전달할 때 사용하는 객체 : Model model
+        model.addAttribute("member", memberDto);
+        // model == dto (data transfer object)
+        // controller -- dto --> service -- dto, entity --> repository
+        // -- entity, dto --> service -- dto --> controller -- dto -> view
+        return "main/index2"; // view
+    }
 }

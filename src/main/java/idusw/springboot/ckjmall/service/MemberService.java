@@ -1,40 +1,41 @@
 package idusw.springboot.ckjmall.service;
 
 import idusw.springboot.ckjmall.entity.MemberEntity;
-import idusw.springboot.ckjmall.model.Member;
+import idusw.springboot.ckjmall.model.MemberDto;
 
 import java.util.List;
 
 public interface MemberService {
-    // interface : 외부 상호 작용 방법 제시
-    // C.R.U.D :
-    int create(Member dto);
-    Member read(Member dto);
-    List<Member> readList();
-    int update(Member dto);
-    int delete(Member dto);
+    int create(MemberDto memberDto);
+    MemberDto readByIdx(Long idx);
+    List<MemberDto> readAll();
+    int update(MemberDto memberDto);
+    int delete(MemberDto memberDto);
 
-    Member login(Member dto); // dto 객체가 id/pw 를 전달해줌
-    // Member -> MemberEntity : Repository에서는 MemberEntity를 다룸
-    default MemberEntity dtoToEntity(Member member) {
+    MemberDto loginById(MemberDto memberDto); // id / pw 활용
+
+    // Conversion
+    default MemberEntity dtoToEntity(MemberDto memberDto) {
         MemberEntity entity = MemberEntity.builder()
-                .idx(member.getIdx())
-                .id(member.getId())
-                .pw(member.getPw())
-                .name(member.getName())
-                .email(member.getEmail())
+                .idx(memberDto.getIdx())
+                .id(memberDto.getId())
+                .pw(memberDto.getPw())
+                .name(memberDto.getName())
+                .email(memberDto.getEmail())
                 .build();
         return entity;
     }
-    // MemberEntity -> : Controller에서는 Member를 다룸
-    default Member entityToDto(MemberEntity entity) {
-        Member member = Member.builder()
+
+    default MemberDto entityToDto(MemberEntity entity) {
+        MemberDto memberDto = MemberDto.builder()
                 .idx(entity.getIdx())
                 .id(entity.getId())
                 .pw(entity.getPw())
                 .name(entity.getName())
                 .email(entity.getEmail())
+                .regDate(entity.getRegDate())
+                .modDate(entity.getModDate())
                 .build();
-        return member;
+        return memberDto;
     }
 }

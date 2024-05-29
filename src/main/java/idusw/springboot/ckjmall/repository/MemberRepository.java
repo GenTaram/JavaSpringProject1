@@ -1,25 +1,24 @@
 package idusw.springboot.ckjmall.repository;
 
-import idusw.springboot.ckjmall.model.Member;
+import idusw.springboot.ckjmall.entity.MemberEntity;
+import idusw.springboot.ckjmall.model.MemberDto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface MemberRepository {
-    // C.R.U.D : Data Basic Operation
-    // Create -> insert
-    // Read -> select
-    // Update -> update
-    // Delete -> delete
-    int insert(Member member);
-    Member selectById(Member member);
-    List<Member> selectList();
-    int update(Member member);
-    int delete(Member member);
+@Repository
+public interface MemberRepository extends
+        JpaRepository<MemberEntity, Long> {
 
+    Optional<MemberEntity> findByIdx(Long idx);
+    Optional<MemberEntity> findByIdAndPw(String id, String pw);
+
+    //QuerydslPredicateExecutor<MemberEntity> {
     /*
-    Member selectByEmail(Member member);
-    List<Member sort(String direction);
-    List<Member> selectListByCondition(String condition, String direction);
-    */
+    @Query("select m from MemberEntity m where m.id = :id and m.pw = :pw")
+    Object getMemberEntityById(@Param("id") String id, @Param("pw") String pw);
+
+     */
 
 }
